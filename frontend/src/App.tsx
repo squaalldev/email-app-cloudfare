@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import './App.css';
 import ChatWindow from './components/ChatWindow';
 import ChatHistory from './components/ChatHistory';
+import { apiUrl } from './lib/api';
 
 export interface ChatSummary {
   chat_id: string;
@@ -28,7 +29,7 @@ function App() {
 
   const fetchWithUid = (path: string, init?: RequestInit) => {
     const separator = path.includes('?') ? '&' : '?';
-    return fetch(`${path}${separator}uid=${encodeURIComponent(uid)}`, init);
+    return fetch(apiUrl(`${path}${separator}uid=${encodeURIComponent(uid)}`), init);
   };
 
   const getResponseError = async (response: Response, fallback: string) => {
