@@ -127,3 +127,36 @@ Conecta frontend -> backend con:
 # frontend/.env.production
 VITE_API_BASE=https://email-app-api.<tu-subdominio>.workers.dev
 ```
+
+
+## Cómo cargar secrets (rápido)
+
+En `cloudflare/worker-api`:
+
+```bash
+npx wrangler secret put GOOGLE_API_KEY
+npx wrangler secret put CF_AIG_TOKEN
+npx wrangler secret list
+```
+
+Con environment específico:
+
+```bash
+npx wrangler secret put GOOGLE_API_KEY --env production
+npx wrangler secret put CF_AIG_TOKEN --env production
+```
+
+En dashboard: **Workers & Pages → tu Worker → Settings → Variables and Secrets → Secrets**.
+
+
+## Troubleshooting: "only has static assets"
+
+Si en Settings ves: **"Variables cannot be added to a Worker that only has static assets"**, no es un Worker de runtime, es un despliegue estático.
+
+Debes desplegar el backend desde `cloudflare/worker-api` (con `main = "src/index.ts"` en `wrangler.toml`) para habilitar secrets/bindings.
+
+Checklist rápido:
+- Root directory del proyecto Worker: `cloudflare/worker-api`
+- Deploy command: `npm run deploy` o `npx wrangler deploy`
+- Confirmar que en runtime exista handler `fetch` (archivo `src/index.ts`)
+- Re-deploy

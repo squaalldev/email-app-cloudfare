@@ -99,6 +99,67 @@ Deploy:
 npm run deploy
 ```
 
+
+
+### 1.1) ¿Cómo meto los secrets en Cloudflare?
+
+Tienes 2 opciones:
+
+#### Opción A: CLI (recomendada)
+Desde `cloudflare/worker-api`:
+
+```bash
+npx wrangler secret put GOOGLE_API_KEY
+npx wrangler secret put CF_AIG_TOKEN
+```
+
+Wrangler te pedirá el valor de cada secret en stdin y lo guarda cifrado en Cloudflare.
+
+Si usas ambientes:
+
+```bash
+npx wrangler secret put GOOGLE_API_KEY --env production
+npx wrangler secret put CF_AIG_TOKEN --env production
+```
+
+Listar nombres de secrets (sin mostrar valores):
+
+```bash
+npx wrangler secret list
+```
+
+#### Opción B: Dashboard Cloudflare
+1. Ve a **Workers & Pages**.
+2. Abre tu Worker `email-app-api`.
+3. Entra a **Settings → Variables and Secrets**.
+4. En **Secrets**, agrega:
+   - `GOOGLE_API_KEY`
+   - `CF_AIG_TOKEN` (opcional)
+5. Guarda y vuelve a desplegar si es necesario.
+
+> Nota: `CF_ACCOUNT_ID` y `CF_GATEWAY_ID` pueden ir en `[vars]` de `wrangler.toml` (no secretos), pero también puedes manejarlos como secrets si prefieres.
+
+
+### 1.2) Si no te deja agregar secrets (caso de tu screenshot)
+
+Si ves el mensaje **"Variables cannot be added to a Worker that only has static assets"**, ese Worker fue creado como **Static Assets only** (sin runtime handler).
+
+Eso pasa cuando Cloudflare está subiendo solo archivos estáticos y no está usando `main = "src/index.ts"`.
+
+**Cómo corregirlo:**
+
+1. En Cloudflare, crea (o ajusta) un Worker de API que apunte al proyecto `cloudflare/worker-api`.
+2. En Build settings del Worker, usa:
+   - **Root directory**: `cloudflare/worker-api`
+   - **Deploy command**: `npm run deploy` (o `npx wrangler deploy`)
+3. Verifica que el `wrangler.toml` cargado sea el de `cloudflare/worker-api` (debe tener `main = "src/index.ts"`).
+4. Vuelve a desplegar.
+5. Después de eso, ya aparecerá habilitada la sección de **Variables and Secrets** para agregar `GOOGLE_API_KEY` y `CF_AIG_TOKEN`.
+
+> Recomendación: separa frontend y backend en dos proyectos:
+> - `email-app-frontend` (Pages)
+> - `email-app-api` (Worker runtime)
+
 ### 2) Frontend React en Cloudflare Pages
 
 En `frontend` define la URL pública del Worker:
