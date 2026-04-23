@@ -18,3 +18,9 @@ build/
 *.swp
 .cache/
 .pytest_cache/
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+!.env.example
