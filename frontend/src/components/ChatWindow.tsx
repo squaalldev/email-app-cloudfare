@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { apiUrl } from '../lib/api';
 
 interface Message {
   id: string;
@@ -161,7 +162,7 @@ function ChatWindow({ chatId, uid, onRefreshChats, onEnsureChat, onError }: Prop
   const [chatError, setChatError] = useState<string | null>(null);
 
   const loadMessages = async (targetChatId: string) => {
-    const response = await fetch(withUidPath(`/api/chats/${targetChatId}/messages`, uid));
+    const response = await fetch(apiUrl(withUidPath(`/api/chats/${targetChatId}/messages`, uid)));
     if (!response.ok) {
       throw new Error('No se pudo cargar el historial');
     }
@@ -213,7 +214,7 @@ function ChatWindow({ chatId, uid, onRefreshChats, onEnsureChat, onError }: Prop
     setChatError(null);
 
     try {
-      const response = await fetch(withUidPath(`/api/chats/${activeChatId}/messages`, uid), {
+      const response = await fetch(apiUrl(withUidPath(`/api/chats/${activeChatId}/messages`, uid)), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ content, is_example: isExample }),
